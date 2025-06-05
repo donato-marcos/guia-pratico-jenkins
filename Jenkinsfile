@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    triggers {
+        pollSCM('')
+    }
+
     stages {
         stage('Build Docker Image') {
             steps {
@@ -22,8 +26,14 @@ pipeline {
         }
 
         stage('Deploy no Kubernetes') {
+            environment {
+                tag_version = "${env.BUILD_ID}"
+            }
             steps {
-              sh 'echo "Executando o comando kubectl apply"'
+                withKubeConfig([credentialsId: 'kubeconfig', serverUrl: 'https://192.168.1.81:6443']) {
+                    sh "sed -i 's/{{tag}}/${tag_version}/g' ./k8s/deployment.yaml"
+                    sh 'kubectl apply -f k8s/deployment.yaml'
+                }
             }
         }
     }
