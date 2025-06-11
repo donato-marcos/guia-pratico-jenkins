@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: conversao-temperatura
-  namespace: medicao
 spec:
   replicas: 2
   selector:
